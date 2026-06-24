@@ -278,23 +278,23 @@ export default function InventoryBrowser({ cars }: { cars: InventoryCar[] }) {
                     </p>
                     <div className="mt-5 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
                       <div className="border border-white/10 bg-zinc-950 p-3">
-                        <span className="block text-zinc-500">Date</span>
-                        <strong className="text-white">{car.Date}</strong>
+                        <span className="block text-orange-500">Date</span>
+                        <strong className="text-orange-500">{car.Date}</strong>
                       </div>
                       <div className="border border-white/10 bg-zinc-950 p-3">
-                        <span className="block text-zinc-500">KM</span>
-                        <strong className="text-white">{formatKm(car.KM)}</strong>
+                        <span className="block text-orange-500">KM</span>
+                        <strong className="text-orange-500">{formatKm(car.KM)}</strong>
                       </div>
                       <div className="border border-white/10 bg-zinc-950 p-3">
-                        <span className="block text-zinc-500">Color</span>
-                        <strong className="text-white">{car.Color}</strong>
+                        <span className="block text-orange-500">Color</span>
+                        <strong className="text-orange-500">{car.Color}</strong>
                       </div>
                     </div>
                     <div className="mt-4 border-t border-white/10 pt-4">
-                      <span className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">
+                      <span className="text-sm font-black uppercase tracking-[0.18em] text-orange-500">
                         Extras
                       </span>
-                      <p className="mt-2 min-h-12 text-zinc-300">
+                      <p className="mt-2 min-h-12 text-orange-500">
                         {car.EXTRAS || "Geen extra&apos;s vermeld"}
                       </p>
                     </div>
