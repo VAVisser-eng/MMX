@@ -55,9 +55,6 @@ const parseCsv = (csv: string) => {
   return rows;
 };
 
-const normalizeKey = (value: string) =>
-  value.toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
-
 const decodeHtml = (value = "") =>
   value
     .replace(/&nbsp;/g, " ")
@@ -87,6 +84,42 @@ const digitsOnly = (value = "") => value.replace(/[^\d]/g, "");
 
 const yearFromDate = (date = "") => date.match(/\d{4}/)?.[0] ?? "";
 
+const getModelType = (model = "") => {
+  const normalized = model.toLowerCase();
+
+  if (normalized.includes("model 3")) return "Model 3";
+  if (normalized.includes("model y")) return "Model Y";
+  if (normalized.includes("model s")) return "Model S";
+  if (normalized.includes("model x")) return "Model X";
+  return "";
+};
+
+const getModelVariant = (model = "") => {
+  const normalized = model.toLowerCase();
+
+  if (normalized.includes("performance")) return "Performance";
+  if (normalized.includes("highland")) return "Highland";
+  if (normalized.includes("long range") && normalized.includes("awd")) return "Long Range AWD";
+  if (normalized.includes("long range") && normalized.includes("rwd")) return "Long Range RWD";
+  if (normalized.includes("long range")) return "Long Range";
+  if (normalized.includes("rwd") || normalized.includes("sr+")) return "RWD";
+  return "";
+};
+
+const isModelMatch = (sheetModel: string, listingModel: string) => {
+  const sheetType = getModelType(sheetModel);
+  const listingType = getModelType(listingModel);
+  const sheetVariant = getModelVariant(sheetModel);
+  const listingVariant = getModelVariant(listingModel);
+
+  if (!sheetType || sheetType !== listingType) return false;
+  if (!sheetVariant) return true;
+  if (sheetVariant === "Highland") return listingVariant === "Highland";
+  if (sheetVariant === "RWD") return listingVariant === "RWD";
+
+  return listingVariant === sheetVariant;
+};
+
 const pickImage = (html = "") => {
   const srcset = html.match(/(?:data-srcset|srcset)="([^"]+)"/)?.[1] ?? "";
   const src = html.match(/(?:data-src|src)="([^"]+)"/)?.[1] ?? "";
@@ -99,7 +132,6 @@ const pickImage = (html = "") => {
 };
 
 type Listing = {
-  color?: string;
   href: string;
   image: string;
   km: string;
@@ -107,33 +139,6 @@ type Listing = {
   price: string;
   title: string;
   year: string;
-};
-
-const colorAliases: Record<string, string[]> = {
-  black: ["black", "zwart"],
-  blue: ["blue", "blauw"],
-  grey: ["grey", "gray", "grijs", "midnight silver", "stealth grey"],
-  red: ["red", "rood", "cherry"],
-  silver: ["silver", "zilver"],
-  white: ["white", "wit", "pearl white"],
-};
-
-const normalizeColor = (value = "") => {
-  const normalized = value.toLowerCase().trim();
-  const match = Object.entries(colorAliases).find(([color, aliases]) =>
-    [color, ...aliases].some((alias) => normalized.includes(alias)),
-  );
-
-  return match?.[0] ?? normalized;
-};
-
-const inferColor = (value = "") => {
-  const normalized = value.toLowerCase();
-  const match = Object.entries(colorAliases).find(([, aliases]) =>
-    aliases.some((alias) => normalized.includes(alias)),
-  );
-
-  return match?.[0] ?? "";
 };
 
 async function getListings() {
@@ -168,7 +173,6 @@ async function getListings() {
         );
 
         return {
-          color: inferColor(text),
           href,
           image: pickImage(cardHtml),
           km: digitsOnly(text.match(/\b[\d,.]+km\b/i)?.[0] ?? ""),
@@ -188,50 +192,22 @@ async function getListings() {
   }
 }
 
-const enrichListingColor = async (listing: Listing) => {
-  if (listing.color) return listing;
-
-  try {
-    const response = await fetch(listing.href, {
-      next: { revalidate: 300 },
-    });
-
-    if (!response.ok) return listing;
-
-    return {
-      ...listing,
-      color: inferColor(decodeHtml(await response.text())),
-    };
-  } catch {
-    return listing;
-  }
-};
-
-const findListing = async (car: InventoryCar, listings: Listing[]) => {
-  const model = normalizeKey(normalizeModel(car.Model));
+const findListing = (car: InventoryCar, listings: Listing[]) => {
   const price = digitsOnly(car.PRICE);
   const km = digitsOnly(car.KM);
   const year = yearFromDate(car.Date);
-  const color = normalizeColor(car.Color);
 
   const modelAndPrice = listings.filter(
-    (listing) => normalizeKey(listing.model).includes(model) && listing.price === price,
+    (listing) => isModelMatch(car.Model, listing.model) && listing.price === price,
   );
 
   if (!modelAndPrice.length) return undefined;
 
-  const colorCheckedListings = await Promise.all(modelAndPrice.map(enrichListingColor));
-  const matchingColorListings = color
-    ? colorCheckedListings.filter((listing) => listing.color === color)
-    : colorCheckedListings;
-
-  if (!matchingColorListings.length) return undefined;
-
   return (
-    matchingColorListings.find((listing) => listing.km === km && listing.year === year) ??
-    matchingColorListings.find((listing) => listing.km === km) ??
-    matchingColorListings.find((listing) => listing.year === year) ??
-    matchingColorListings[0]
+    modelAndPrice.find((listing) => listing.km === km && listing.year === year) ??
+    modelAndPrice.find((listing) => listing.km === km) ??
+    modelAndPrice.find((listing) => listing.year === year) ??
+    modelAndPrice[0]
   );
 };
 

@@ -78,6 +78,19 @@ const translateStatus = (status: string) => {
   return status;
 };
 
+const teslaColorSwatch = (color: string) => {
+  const value = color.toLowerCase();
+
+  if (value.includes("white")) return "bg-[#f4f4f1]";
+  if (value.includes("blue")) return "bg-[#123a6f]";
+  if (value.includes("black")) return "bg-[#050505]";
+  if (value.includes("red") || value.includes("cherry")) return "bg-[#9f111b]";
+  if (value.includes("silver")) return "bg-[#b8bdc1]";
+  if (value.includes("grey") || value.includes("gray")) return "bg-[#5f6469]";
+
+  return "bg-zinc-500";
+};
+
 function CarVisual({ car }: { car: InventoryCar }) {
   const isLargeBody = car.Model.includes("Model Y") || car.Model.includes("Model X");
   const carColor = colorClass(car.Color);
@@ -277,24 +290,30 @@ export default function InventoryBrowser({ cars }: { cars: InventoryCar[] }) {
                       {car.Codename || "MMX voorraad"}
                     </p>
                     <div className="mt-5 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
-                      <div className="border border-white/10 bg-zinc-950 p-3">
+                      <div className="border border-white/10 bg-[#181818] p-3">
                         <span className="block text-orange-500">Date</span>
-                        <strong className="text-orange-500">{car.Date}</strong>
+                        <strong className="text-white">{car.Date}</strong>
                       </div>
-                      <div className="border border-white/10 bg-zinc-950 p-3">
+                      <div className="border border-white/10 bg-[#181818] p-3">
                         <span className="block text-orange-500">KM</span>
-                        <strong className="text-orange-500">{formatKm(car.KM)}</strong>
+                        <strong className="text-white">{formatKm(car.KM)}</strong>
                       </div>
-                      <div className="border border-white/10 bg-zinc-950 p-3">
+                      <div className="border border-white/10 bg-[#181818] p-3">
                         <span className="block text-orange-500">Color</span>
-                        <strong className="text-orange-500">{car.Color}</strong>
+                        <strong className="flex items-center gap-2 text-white">
+                          <span
+                            className={`inline-block size-4 rounded-full border border-white ${teslaColorSwatch(car.Color)}`}
+                            aria-hidden="true"
+                          />
+                          {car.Color}
+                        </strong>
                       </div>
                     </div>
                     <div className="mt-4 border-t border-white/10 pt-4">
                       <span className="text-sm font-black uppercase tracking-[0.18em] text-orange-500">
                         Extras
                       </span>
-                      <p className="mt-2 min-h-12 text-orange-500">
+                      <p className="mt-2 min-h-12 text-white">
                         {car.EXTRAS || "Geen extra&apos;s vermeld"}
                       </p>
                     </div>
