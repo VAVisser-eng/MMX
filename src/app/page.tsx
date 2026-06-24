@@ -2,7 +2,7 @@ import InventoryBrowser, { type InventoryCar } from "./InventoryBrowser";
 import localInventory from "@/data/inventory.json";
 
 const sheetCsvUrl =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOR5zDBqzJ-dUC-aa7EWkz2uAIx0ULVfs32lQZ8OdeKDZrocc9fFkKI7rJl5b_eMMLzAGdrM9BQAex/pub?gid=883902162&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7exQlwHvimGqlYpggDpvTrIpp07J411U2XJ0WZZg3Asu1A7lJoqgz8ZoA1hWi3yggO59F9CpUUion/pub?single=true&output=csv";
 
 const fallbackCars = localInventory as InventoryCar[];
 
