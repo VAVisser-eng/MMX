@@ -1,20 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "MMX",
-  description: "MMX is being built for launch on Vercel.",
+  title: "MMX B.V. | Tweedehands Tesla specialist",
+  description:
+    "MMX B.V. helpt je een jonge tweedehands Tesla Model 3 of Model Y te vinden, samen te stellen en zorgeloos te rijden.",
 };
 
 export default function RootLayout({
@@ -23,11 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-full flex flex-col bg-black">{children}</body>
     </html>
   );
 }
