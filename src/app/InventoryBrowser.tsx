@@ -18,10 +18,10 @@ export type InventoryCar = {
 };
 
 const typeOptions = [
-  { id: "3", label: "3", title: "Model 3" },
-  { id: "Y", label: "Y", title: "Model Y" },
   { id: "S", label: "S", title: "Model S" },
+  { id: "3", label: "3", title: "Model 3" },
   { id: "X", label: "X", title: "Model X" },
+  { id: "Y", label: "Y", title: "Model Y" },
 ];
 
 const getType = (model: string) => {
@@ -224,7 +224,7 @@ export default function InventoryBrowser({ cars }: { cars: InventoryCar[] }) {
                 }}
                 className="rounded-sm border border-white/15 px-5 py-3 text-sm font-black text-white transition hover:border-orange-500 hover:text-orange-400"
               >
-                Terug naar 3 / Y / S / X
+                Terug naar S / 3 / X / Y
               </button>
             ) : null}
             {selectedModel ? (
