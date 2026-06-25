@@ -168,8 +168,8 @@ export default function InventoryBrowser({ cars }: { cars: InventoryCar[] }) {
       <section className="border-b border-white/10 bg-[radial-gradient(circle_at_70%_10%,rgba(255,111,0,0.20),transparent_32%),linear-gradient(135deg,#000_0%,#080808_52%,#160b02_100%)]">
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-10">
           <a href="#" className="flex items-center gap-3" aria-label="MMX home">
-            <span className="grid size-10 place-items-center rounded-sm border border-orange-500/60 bg-white text-xl font-black text-black">
-              M
+            <span className="grid size-10 place-items-center rounded-sm border border-orange-500/60 bg-white text-sm font-black text-black">
+              MM<span className="text-orange-500">X</span>
             </span>
             <span className="text-2xl font-black tracking-[0.2em]">
               MM<span className="text-orange-500">X</span>
