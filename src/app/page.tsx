@@ -82,8 +82,6 @@ const normalizeModel = (value: string) =>
 const hasPrice = (value: string) => /\d/.test(value);
 const digitsOnly = (value = "") => value.replace(/[^\d]/g, "");
 
-const yearFromDate = (date = "") => date.match(/\d{4}/)?.[0] ?? "";
-
 const getModelType = (model = "") => {
   const normalized = model.toLowerCase();
 
@@ -92,32 +90,6 @@ const getModelType = (model = "") => {
   if (normalized.includes("model s")) return "Model S";
   if (normalized.includes("model x")) return "Model X";
   return "";
-};
-
-const getModelVariant = (model = "") => {
-  const normalized = model.toLowerCase();
-
-  if (normalized.includes("performance")) return "Performance";
-  if (normalized.includes("highland")) return "Highland";
-  if (normalized.includes("long range") && normalized.includes("awd")) return "Long Range AWD";
-  if (normalized.includes("long range") && normalized.includes("rwd")) return "Long Range RWD";
-  if (normalized.includes("long range")) return "Long Range";
-  if (normalized.includes("rwd") || normalized.includes("sr+")) return "RWD";
-  return "";
-};
-
-const isModelMatch = (sheetModel: string, listingModel: string) => {
-  const sheetType = getModelType(sheetModel);
-  const listingType = getModelType(listingModel);
-  const sheetVariant = getModelVariant(sheetModel);
-  const listingVariant = getModelVariant(listingModel);
-
-  if (!sheetType || sheetType !== listingType) return false;
-  if (!sheetVariant) return true;
-  if (sheetVariant === "Highland") return listingVariant === "Highland";
-  if (sheetVariant === "RWD") return listingVariant === "RWD";
-
-  return listingVariant === sheetVariant;
 };
 
 const pickImage = (html = "") => {
@@ -135,10 +107,9 @@ type Listing = {
   href: string;
   image: string;
   km: string;
-  model: string;
+  modelType: string;
   price: string;
   title: string;
-  year: string;
 };
 
 async function getListings() {
@@ -176,16 +147,15 @@ async function getListings() {
           href,
           image: pickImage(cardHtml),
           km: digitsOnly(text.match(/\b[\d,.]+km\b/i)?.[0] ?? ""),
-          model: normalizeModel(title),
+          modelType: getModelType(title),
           price: digitsOnly(text.match(/(?:€|â‚¬)\s?[\d,.]+/)?.[0] ?? ""),
           title,
-          year: text.match(/\b20\d{2}\b/)?.[0] ?? "",
         };
       }),
     );
 
     return listings.filter(
-      (listing) => listing.href && listing.image && listing.model && listing.price,
+      (listing) => listing.href && listing.image && listing.modelType && listing.price && listing.km,
     );
   } catch {
     return [];
@@ -193,21 +163,15 @@ async function getListings() {
 }
 
 const findListing = (car: InventoryCar, listings: Listing[]) => {
+  const modelType = getModelType(car.Model);
   const price = digitsOnly(car.PRICE);
   const km = digitsOnly(car.KM);
-  const year = yearFromDate(car.Date);
 
-  const modelAndPrice = listings.filter(
-    (listing) => isModelMatch(car.Model, listing.model) && listing.price === price,
-  );
-
-  if (!modelAndPrice.length) return undefined;
-
-  return (
-    modelAndPrice.find((listing) => listing.km === km && listing.year === year) ??
-    modelAndPrice.find((listing) => listing.km === km) ??
-    modelAndPrice.find((listing) => listing.year === year) ??
-    modelAndPrice[0]
+  return listings.find(
+    (listing) =>
+      listing.modelType === modelType &&
+      listing.price === price &&
+      listing.km === km,
   );
 };
 
