@@ -92,6 +92,23 @@ const getModelType = (model = "") => {
   return "";
 };
 
+const getModel3ColorImage = (color = "") => {
+  const normalized = color.toLowerCase();
+
+  if (normalized.includes("cherry")) {
+    return "/inventory-images/model-3-cherry-red.jpeg";
+  }
+  if (normalized.includes("red")) return "/inventory-images/model-3-red.jpeg";
+  if (normalized.includes("blue")) return "/inventory-images/model-3-blue.jpeg";
+  if (normalized.includes("black")) return "/inventory-images/model-3-black.jpeg";
+  if (normalized.includes("grey") || normalized.includes("gray") || normalized.includes("silver")) {
+    return "/inventory-images/model-3-grey.jpeg";
+  }
+  if (normalized.includes("white")) return "/inventory-images/model-3-white.jpeg";
+
+  return undefined;
+};
+
 const pickImage = (html = "") => {
   const srcset = html.match(/(?:data-srcset|srcset)="([^"]+)"/)?.[1] ?? "";
   const src = html.match(/(?:data-src|src)="([^"]+)"/)?.[1] ?? "";
@@ -217,11 +234,13 @@ async function getCars() {
 
     return Promise.all(
       cars.map(async (car) => {
+        const localModel3Image =
+          getModelType(car.Model) === "Model 3" ? getModel3ColorImage(car.Color) : undefined;
         const listing = await findListing(car, listings);
 
         return {
           ...car,
-          Image: listing?.image,
+          Image: localModel3Image ?? listing?.image,
           SourceUrl: listing?.href,
         };
       }),
