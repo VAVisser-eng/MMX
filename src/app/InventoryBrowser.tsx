@@ -84,11 +84,19 @@ const teslaColorSwatch = (color: string) => {
   if (value.includes("white")) return "bg-[#f4f4f1]";
   if (value.includes("blue")) return "bg-[#123a6f]";
   if (value.includes("black")) return "bg-[#050505]";
-  if (value.includes("red") || value.includes("cherry")) return "bg-[#9f111b]";
+  if (value.includes("red") || value.includes("cherry")) return "bg-[#4b1018]";
   if (value.includes("silver")) return "bg-[#b8bdc1]";
   if (value.includes("grey") || value.includes("gray")) return "bg-[#5f6469]";
 
   return "bg-zinc-500";
+};
+
+const displayColor = (color: string) => {
+  const value = color.toLowerCase();
+
+  if (value.includes("cherry") || value === "red") return "Cherry Red";
+
+  return color;
 };
 
 function CarVisual({ car }: { car: InventoryCar }) {
@@ -305,7 +313,7 @@ export default function InventoryBrowser({ cars }: { cars: InventoryCar[] }) {
                             className={`inline-block size-4 rounded-full border border-white ${teslaColorSwatch(car.Color)}`}
                             aria-hidden="true"
                           />
-                          {car.Color}
+                          {displayColor(car.Color)}
                         </strong>
                       </div>
                     </div>
